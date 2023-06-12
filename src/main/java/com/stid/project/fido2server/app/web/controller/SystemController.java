@@ -6,16 +6,13 @@ import com.stid.project.fido2server.app.domain.entity.Package;
 import com.stid.project.fido2server.app.domain.entity.RelyingParty;
 import com.stid.project.fido2server.app.domain.entity.UserAccount;
 import com.stid.project.fido2server.app.domain.model.*;
-import com.stid.project.fido2server.app.security.CurrentSpringUser;
 import com.stid.project.fido2server.app.security.JwtTokenScope;
-import com.stid.project.fido2server.app.security.SpringUser;
 import com.stid.project.fido2server.app.service.PackageService;
 import com.stid.project.fido2server.app.service.SystemService;
 import com.stid.project.fido2server.app.service.UserAccountService;
 import com.stid.project.fido2server.app.web.form.PackageCreateForm;
 import com.stid.project.fido2server.app.web.form.PackageUpdateForm;
 import com.stid.project.fido2server.app.web.form.RelyingPartyCreateForm;
-import com.stid.project.fido2server.app.web.form.RelyingPartyUpdateForm;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -65,15 +62,6 @@ public class SystemController extends AbstractSecuredController {
         return ResponseEntity.ok(mapperService.mapping(relyingParty));
     }
 
-    @Operation(summary = "Cập nhật thông tin dịch vụ")
-    @PutMapping("/relying-party/{id}")
-    public ResponseEntity<RelyingPartyDto> updateRelyingParty(
-            @PathVariable UUID id, @RequestBody @Valid RelyingPartyUpdateForm form, @CurrentSpringUser SpringUser springUser) {
-        LOGGER.debug("updateRelyingParty...");
-        RelyingParty relyingParty = systemService.updateRelyingParty(id, form);
-        return ResponseEntity.ok(mapperService.mapping(relyingParty));
-    }
-
     @Operation(summary = "Kích hoạt sử dụng dịch vụ")
     @PutMapping("/relying-party/{id}/active")
     public ResponseEntity<RelyingPartyDto> updateRelyingPartyStatusActive(@PathVariable UUID id) {
@@ -82,7 +70,7 @@ public class SystemController extends AbstractSecuredController {
         return ResponseEntity.ok(mapperService.mapping(relyingParty));
     }
 
-    @Operation(summary = "Hủy kích hoạt dịch vụ")
+    @Operation(summary = "Hủy kích hoạt dụng dịch vụ")
     @PutMapping("/relying-party/{id}/inactive")
     public ResponseEntity<RelyingPartyDto> updateRelyingPartyStatusInactive(@PathVariable UUID id) {
         LOGGER.debug("updateRelyingPartyStatusInactive...");

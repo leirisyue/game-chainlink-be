@@ -1,12 +1,8 @@
 package com.stid.project.fido2server.app.exception;
 
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 public abstract class RestException extends RuntimeException {
-    @Getter
-    private Object[] params;
-
     public RestException() {
         super();
     }
@@ -25,11 +21,6 @@ public abstract class RestException extends RuntimeException {
 
     protected RestException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
-    }
-
-    public RestException withParams(Object... params) {
-        this.params = params;
-        return this;
     }
 
     public HttpStatus getHttpStatus() {

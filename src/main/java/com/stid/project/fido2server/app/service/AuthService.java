@@ -31,7 +31,7 @@ public class AuthService extends AbstractExceptionHandler {
     }
 
     public AccessToken generateSystemAccessToken(SystemLoginForm form) {
-        Duration duration = form.isRemember() ? Duration.ofDays(1) : Duration.ofHours(1);
+        Duration duration = form.isRemember() ? Duration.ofHours(1) : Duration.ofMinutes(10);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 form.getAccount(), form.getPassword(), Collections.emptySet());
         Authentication authentication = authenticationProvider.authenticate(authenticationToken);

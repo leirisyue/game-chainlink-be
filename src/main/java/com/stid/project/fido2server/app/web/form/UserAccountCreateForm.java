@@ -13,5 +13,8 @@ public class UserAccountCreateForm {
     private String username;
 
     @NotBlank
+    private String password;
+
+    @NotBlank
     private String displayName;
 }

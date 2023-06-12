@@ -36,7 +36,7 @@ public class UserAccountService extends AbstractExceptionHandler {
         userAccount.setUserHandle(HelperUtil.randomUserHandle());
         userAccount.setUserLogin(form.getUsername());
         userAccount.setDisplayName(form.getDisplayName());
-        userAccount.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
+        userAccount.setPasswordHash(passwordEncoder.encode(form.getPassword()));
         userAccount.setRelyingPartyId(relyingPartyId);
         userAccount = userAccountRepository.save(userAccount);
         return userAccount;

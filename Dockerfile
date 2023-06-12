@@ -1,5 +1,5 @@
 # Bước 1: Chọn hình ảnh Java 17 cho Dockerfile
-FROM maven:3-eclipse-temurin-20-alpine
+FROM maven:3.8.3-openjdk-17
 
 WORKDIR /usr/src/app
 

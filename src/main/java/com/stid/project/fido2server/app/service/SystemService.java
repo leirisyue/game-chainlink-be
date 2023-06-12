@@ -15,16 +15,14 @@ import com.stid.project.fido2server.app.security.JwtTokenProvider;
 import com.stid.project.fido2server.app.security.JwtTokenScope;
 import com.stid.project.fido2server.app.util.HelperUtil;
 import com.stid.project.fido2server.app.web.form.RelyingPartyCreateForm;
-import com.stid.project.fido2server.app.web.form.RelyingPartyUpdateForm;
 import com.webauthn4j.data.client.Origin;
+import com.webauthn4j.validator.exception.BadOriginException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 @Service
 public class SystemService extends AbstractExceptionHandler {
@@ -53,14 +51,12 @@ public class SystemService extends AbstractExceptionHandler {
 
     @Transactional
     public RelyingParty createRelyingParty(RelyingPartyCreateForm form) {
+        //URI uri = URI.create(form.getUrl());
         String name = form.getName();
-        Origin origin = form.getOrigin();
-        String originPattern = "^https://([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9-]+\\.[a-zA-Z]{2,6}(:[0-9]+)?/?";
-        if (origin.getHost() == null || !Pattern.matches(originPattern, origin.toString()))
-            throw badRequest("Exception.InvalidOrigin");
 
-        if (relyingPartyRepository.existsByNameAndOrigin(form.getName(), form.getOrigin()))
-            throw badRequest("Exception.RelyingPartyAlreadyExists", form.getName(), form.getOrigin());
+        Origin origin = form.getOrigin();
+        if (origin.getHost() == null || !"https".equals(origin.getScheme()))
+            throw new BadOriginException("'origin' must be a valid URL and start with 'https://'");
 
         String secret = HelperUtil.randomSecret();
 
@@ -71,28 +67,6 @@ public class SystemService extends AbstractExceptionHandler {
         relyingParty.setDescription(form.getDescription());
 
         relyingParty = relyingPartyRepository.save(relyingParty);
-        return relyingParty;
-    }
-
-    @Transactional
-    public RelyingParty updateRelyingParty(UUID id, RelyingPartyUpdateForm form) {
-        RelyingParty relyingParty = relyingPartyRepository.findById(id)
-                .orElseThrow(() -> notFound("Exception.RelyingPartyNotFound"));
-
-        String name = form.getName();
-        Origin origin = form.getOrigin();
-        String originPattern = "^https://([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9-]+\\.[a-zA-Z]{2,6}(:[0-9]+)?/?";
-        if (origin.getHost() == null || !Pattern.matches(originPattern, origin.toString()))
-            throw badRequest("Exception.InvalidOrigin");
-
-        if (!Objects.equals(relyingParty.getOrigin(), origin) || !Objects.equals(relyingParty.getName(), name)) {
-            if (relyingPartyRepository.existsByNameAndOrigin(name, origin))
-                throw badRequest("Exception.RelyingPartyAlreadyExists", name, origin);
-        }
-        relyingParty.setName(name);
-        relyingParty.setOrigin(origin);
-        relyingParty.setDescription(form.getDescription());
-        relyingPartyRepository.save(relyingParty);
         return relyingParty;
     }
 

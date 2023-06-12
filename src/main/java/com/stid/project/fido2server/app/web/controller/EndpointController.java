@@ -12,7 +12,7 @@ import com.stid.project.fido2server.app.service.EndpointService;
 import com.stid.project.fido2server.app.service.EventService;
 import com.stid.project.fido2server.app.service.Fido2Service;
 import com.stid.project.fido2server.app.util.TimeUtils;
-import com.stid.project.fido2server.app.web.form.EndpointInfoUpdateForm;
+import com.stid.project.fido2server.app.web.form.RelyingPartyUpdateForm;
 import com.stid.project.fido2server.app.web.form.UserAccountCreateForm;
 import com.stid.project.fido2server.app.web.form.UserAuthenticatorUpdateForm;
 import com.stid.project.fido2server.fido2.model.*;
@@ -65,7 +65,7 @@ public class EndpointController extends AbstractSecuredController {
     @Operation(summary = "Update service information")
     @PutMapping("/info")
     public ResponseEntity<RelyingPartyDto> updateInfo(
-            @RequestBody @Valid EndpointInfoUpdateForm form, @CurrentSpringUser SpringUser springUser) {
+            @RequestBody @Valid RelyingPartyUpdateForm form, @CurrentSpringUser SpringUser springUser) {
         endpointService.updateInfo(form, springUser.getRelyingParty());
         return ResponseEntity.ok(mapperService.mapping(springUser.getRelyingParty()));
     }
