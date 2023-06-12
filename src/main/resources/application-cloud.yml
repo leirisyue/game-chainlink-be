@@ -1,0 +1,20 @@
+spring:
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database: POSTGRESQL
+  datasource:
+    url: jdbc:postgresql://ep-icy-meadow-139461.ap-southeast-1.aws.neon.tech/FIDO2_SERVER
+    username: fido2server
+    password: spnHya3JZ0oU
+  liquibase:
+    drop-first: false
+
+app:
+  metadata:
+    mds3-endpoints:
+      # https://fido2-server.onrender.com/webauthn
+      - https://mds3.fido.tools/execute/5451531e838d7afdc69cadedcdf45edd8c75f1ec0c29f0e4a2ef3092acea8645
+      - https://mds3.fido.tools/execute/c05a05590eef24b9d8e1000ebd693cdeb166850cf8d180c24f31c6c3274e0124
+      - https://mds3.fido.tools/execute/7bf9b78fabb92ae4c818f02019047a3396042de240dd4872a73eb6464da57518
+      - https://mds3.fido.tools/execute/48e99fe1d661178eaf81e49229367d9cc6da358bcddbcd46ce2c0a6e558e4fc2
+      - https://mds3.fido.tools/execute/6d063b93a07b8b4b0696e5080cb2eedda924fb952e5467522fde3f9aed932801

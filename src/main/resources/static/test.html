@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Test FIDO2 Service</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+    <!-- Bootstrap CSS -->
+    <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" rel="stylesheet">
+</head>
+
+<body>
+<div class="text-center jumbotron">
+    <h1>Test FIDO2 Service</h1>
+    <div class="w-75 mx-auto">
+        <div class="card mb-2">
+            <div class="card-body">
+                <h5 class="card-title">Endpoint Service</h5>
+                <form id="formEndpoint" onsubmit="return false">
+                    <div class="form-group">
+                        <label for="txtEndpointUrl">URL</label>
+                        <input class="text-center form-control" id="txtEndpointUrl" required type="text">
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="txtClientId">Client Id</label>
+                                <input class="text-center form-control" id="txtClientId" required type="text">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="txtClientSecret">Client Secret</label>
+                                <input class="text-center form-control" id="txtClientSecret" required type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <input class="text-left form-control" id="txtBearerToken" placeholder="Please Get Access Token"
+                               readonly type="text">
+                        <span class="input-group-append">
+                                <button class="btn btn-success" form="formEndpoint" onclick="endpoint_access_token()"
+                                        type="submit">Get Access Token</button>
+                            </span>
+                        <span class="input-group-append">
+                                <button class="btn btn-info" form="formEndpoint" onclick="endpoint_test()"
+                                        type="submit">Test</button>
+                            </span>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card mb-2">
+            <div class="card-body">
+                <h5 class="card-title">FIDO2 Attestation</h5>
+                <form id="formRegistration" onsubmit="endpoint_attestation(); return false">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="txtRegUsername">Username</label>
+                                <input class="text-center form-control" id="txtRegUsername" required type="text">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="txtRegDisplayName">Display Name</label>
+                                <input class="text-center form-control" id="txtRegDisplayName" required type="text">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="selAttestation">Attestation</label>
+                                <select class="text-center form-control" id="selAttestation">
+                                    <option selected value="none">none</option>
+                                    <option value="direct">direct</option>
+                                    <option value="indirect">indirect</option>
+                                    <option value="enterprise">enterprise</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="selUserVerification">User Verification</label>
+                                <select class="text-center form-control" id="selUserVerification">
+                                    <option selected value="discouraged">discouraged</option>
+                                    <option value="preferred">preferred</option>
+                                    <option value="required">required</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="selRequireResidentKey">Require Resident Key</label>
+                                <select class="text-center form-control" id="selRequireResidentKey">
+                                    <option selected value="false">false</option>
+                                    <option value="true">true</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" type="submit">Attestation</button>
+                </form>
+            </div>
+        </div>
+        <div class="card mb-2">
+            <div class="card-body">
+                <h5 class="card-title">FIDO2 Assertion</h5>
+                <form id="formAuthentication" onsubmit="endpoint_assertion(); return false">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="txtAuthUsername">Username</label>
+                                <input class="text-center form-control" id="txtAuthUsername" required type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" type="submit">
+                        Assertion
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="card mb-2">
+            <div class="card-body">
+                <button class="btn btn-success" onclick="endpoint_assertion(true)" type="button">
+                    Login Usernameless
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Optional JavaScript -->
+<script>
+        // Onload
+        window.onload = () => {
+            txtEndpointUrl.value = localStorage.getItem("endpoint_url") || window.location.origin
+            txtClientId.value = localStorage.getItem("client_id")
+            txtClientSecret.value = localStorage.getItem("client_secret")
+            cookieStore.get('client_token').then(cook => txtBearerToken.value = cook?.value || '')
+
+            if (!webauthnJSON.supported()) {
+                alert('This browser unsupported webauthn')
+            }
+        }
+        // End Onload
+
+        function endpoint_access_token() {
+            localStorage.setItem('endpoint_url', txtEndpointUrl.value)
+            localStorage.setItem('client_id', txtClientId.value)
+            localStorage.setItem('client_secret', txtClientSecret.value)
+            fetch(`${txtEndpointUrl.value}/api/auth/endpoint/access-token`, {
+                method: 'post',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    "clientId": txtClientId.value,
+                    "clientSecret": txtClientSecret.value,
+                    "timeoutInSeconds": 600
+                })
+            })
+                .then(res => res.json())
+                .then(res => {
+                    console.log(res);
+                    txtBearerToken.value = res.token
+                    cookieStore.set({ name: 'client_token', value: res.token, expires: new Date(res.expiresAt) })
+                })
+            return false
+        }
+
+        function endpoint_test() {
+            fetch(`${txtEndpointUrl.value}/api/endpoint/status`, {
+                method: 'get',
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + txtBearerToken.value
+                }
+            }).then(res => res.json()).then(res => {
+                console.log(res);
+                alert(JSON.stringify(res, null, 2))
+            })
+        }
+
+        function endpoint_attestation() {
+            console.log('endpoint_attestation...')
+            fetch(`${txtEndpointUrl.value}/api/endpoint/attestation/options`, {
+                method: 'post',
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + txtBearerToken.value
+                },
+                body: JSON.stringify({
+                    "username": txtRegUsername.value,
+                    "displayName": txtRegDisplayName.value,
+                    "attestation": selAttestation.value,
+                    "authenticatorSelection": {
+                        "userVerification": selUserVerification.value,
+                        "requireResidentKey": selRequireResidentKey.value
+                    }
+                })
+            }).then(res => res.json()).then(res => {
+                console.log(res);
+                if (res.status !== 'ok') {
+                    alert(JSON.stringify(res, null, 2))
+                    return;
+                }
+                try {
+                    webauthnJSON.create({
+                        "publicKey": res
+                    }).then(response => {
+                        console.log(response);
+                        fetch(`${txtEndpointUrl.value}/api/endpoint/attestation/result`, {
+                            method: 'post',
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": "Bearer " + txtBearerToken.value
+                            },
+                            body: JSON.stringify(response)
+                        })
+                            .then(res => res.json())
+                            .then(res => {
+                                alert(JSON.stringify(res, null, 2))
+                            })
+                            .catch(err => {
+                                alert(JSON.stringify(err, null, 2))
+                            })
+                    })
+                } catch (error) {
+                    alert(JSON.stringify(error, null, 2))
+                }
+            })
+        }
+
+        function endpoint_assertion(usernameless) {
+            console.log('endpoint_assertion...')
+            var body = {
+                "username": txtAuthUsername.value,
+                "userVerification": selUserVerification.value
+            }
+
+            if(usernameless)
+                delete body.username
+
+            fetch(`${txtEndpointUrl.value}/api/endpoint/assertion/options`, {
+                method: 'post',
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + txtBearerToken.value
+                },
+                body: JSON.stringify(body)
+            }).then(res => res.json()).then(res => {
+                console.log(res);
+                if (res.status !== 'ok') {
+                    alert(JSON.stringify(res, null, 2))
+                    return;
+                }
+                try {
+                    webauthnJSON.get({
+                        "publicKey": res
+                    }).then(response => {
+                        console.log(response);
+                        fetch(`${txtEndpointUrl.value}/api/endpoint/assertion/result`, {
+                            method: 'post',
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": "Bearer " + txtBearerToken.value
+                            },
+                            body: JSON.stringify(response)
+                        })
+                            .then(res => res.json())
+                            .then(res => {
+                                console.log(res);
+                                alert(JSON.stringify(res, null, 2))
+                            })
+                            .catch(err => {
+                                console.log(err);
+                                alert(JSON.stringify(err, null, 2))
+                            })
+                    })
+                } catch (error) {
+                    alert(JSON.stringify(error, null, 2))
+                }
+            })
+        }
+
+
+
+
+
+
+
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@github/webauthn-json/dist/browser-global/webauthn-json.browser-global.min.js"></script>
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script crossorigin="anonymous" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script crossorigin="anonymous" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script crossorigin="anonymous" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+
+</html>

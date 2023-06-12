@@ -1,0 +1,16 @@
+The endpoints are at https://mds3.fido.tools
+Test Root Certificate: https://mds3.fido.tools/pki/MDS3ROOT.crt
+
+** Test endpoints for https://api.localhost.ssl:10099
+https://mds3.fido.tools/execute/3846e2db0f5477f7a7b86f1019384539032a30ee1281b430457bfdcda99a49bd
+https://mds3.fido.tools/execute/4396b6545ae5dccd7b34b64209ff7d0ecdeb8af32499a8ce6cfc71cf7ba3f3b6
+https://mds3.fido.tools/execute/dd2f643f6499c74980f7bc016d90ee43272c82bd3ca824480465c1b7f661df65
+https://mds3.fido.tools/execute/0ed2fd80287761ca31c63291d09d5c9ba36ea7a13b7d89906c44bc2c592aac2c
+https://mds3.fido.tools/execute/e17cc2dd52194570e42ab2cc08f0a4d855c5ed5708c4676a80860fdf56edaeeb
+
+** Test endpoints for https://api.localhost.ssl:10099/auth/fido2
+https://mds3.fido.tools/execute/3a010d31826ea26aea2cf36101a0887d58acfe0753a7ff5a93b5073a625dc43d
+https://mds3.fido.tools/execute/e77ccc475614089216e5deaec8e931a02b925daeb19bf5d269d4edaee087d1ea
+https://mds3.fido.tools/execute/d11dfaa166d35c6bb5f4250c867f50a5bf51a267b2647727afc8487dd2bbdc2b
+https://mds3.fido.tools/execute/eeb1805e83116e721bb5a56d3e4eb5a1cef82b114ab7e94aaf7acaf390d445f7
+https://mds3.fido.tools/execute/db152661b2afb9e6798d6ef748d2b64361d2499263c25cf96c235be5b44ffe8f

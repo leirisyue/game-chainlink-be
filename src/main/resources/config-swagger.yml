@@ -1,0 +1,14 @@
+spring:
+  config:
+    activate:
+      on-profile: local, cloud, server
+
+springdoc:
+  show-actuator: true
+  swagger-ui:
+    path: /swagger
+    display-request-duration: true
+    display-operation-id: true
+    doc-expansion: false
+    tags-sorter: alpha
+    operations-sorter: alpha

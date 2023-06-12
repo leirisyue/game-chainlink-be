@@ -1,0 +1,26 @@
+spring:
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database: POSTGRESQL
+  datasource:
+    url: jdbc:postgresql://localhost:5432/FIDO2_SERVER
+    username: postgres
+    password: postgres
+  liquibase:
+    drop-first: false
+
+app:
+  metadata:
+    mds3-endpoints:
+      # https://ws3.fido.vn/webauthn
+      - https://mds3.fido.tools/execute/e56a88f80c000e84c07d868408c2cbed20b2c434539a0858fdb1195621158f4a
+      - https://mds3.fido.tools/execute/77cb1414056a6237f9e6b96ee0ab52d1f429df0c1279f60a5b2218c2a7d3b2c7
+      - https://mds3.fido.tools/execute/0641283d5abe7b662c12d102f0a8873bdddd85d56a3fb954a17426e6ae9d3e96
+      - https://mds3.fido.tools/execute/73e06957f706ef67daabec6a596db21196a49d297c8215910952581a60a3371f
+      - https://mds3.fido.tools/execute/2f2bf15d49962aa72885a4a984876b58e32d2f05514ba2c5e514204fef95bd11
+      # https://fido2.vtcsmarttech.com.vn/webauthn
+      - https://mds3.fido.tools/execute/2e1cf5510273bcdb23eaf7261e637e386bc4aebffd6f5f91237dccc069d008c9
+      - https://mds3.fido.tools/execute/67de77fe9b5ee3b8792c9ed0b8665801761db043c0e2c504dc41e8f1ef8d50f1
+      - https://mds3.fido.tools/execute/e2febd60938dc24eaa44e7fcf734a4da1a9e8d95052cd0e0b5e99f7c2c57f26c
+      - https://mds3.fido.tools/execute/90e39821a101968a23dc69f875ebec21d53f54fd564a33ae2709a3b5d3b266eb
+      - https://mds3.fido.tools/execute/ef97c9d2d207baf63a7ecbe0375389a80d21dedf3d136067146f4ff9c26e7415

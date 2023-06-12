@@ -1,0 +1,137 @@
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="changelog-init" author="system">
+        <sql stripComments="true">
+            CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+            <comment>Add uuid-ossp</comment>
+        </sql>
+    </changeSet>
+
+    <changeSet id="createTable-tbl_relying_party" author="system">
+        <createTable tableName="tbl_relying_party">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="secret" type="varchar(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="origin" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subdomains" type="text"/>
+            <column name="ports" type="text"/>
+            <column name="description" type="varchar(1000)"/>
+            <column name="created_date" type="timestamptz" defaultValueComputed="now()"/>
+            <column name="status" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="createTable-tbl_user" author="system">
+        <createTable tableName="tbl_user">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="user_handle" type="binary">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="user_login" type="varchar(200)"/>
+            <column name="user_email" type="varchar(200)">
+                <constraints unique="true"/>
+            </column>
+            <column name="display_name" type="varchar(200)"/>
+            <column name="password_hash" type="varchar(200)"/>
+            <column name="created_date" type="timestamptz" defaultValueComputed="now()"/>
+            <column name="relying_party_id" type="uuid">
+                <constraints foreignKeyName="tbl_user_relying_party_id_fkey"
+                             references="tbl_relying_party(id)" deleteCascade="true"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="tbl_user" columnNames="user_login, relying_party_id"/>
+    </changeSet>
+
+    <changeSet id="createTable-tbl_authenticator" author="system">
+        <createTable tableName="tbl_authenticator">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(100)" defaultValue="Unnamed">
+                <constraints nullable="false"/>
+            </column>
+            <column name="credential_id" type="binary">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="aaguid" type="binary">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cose_key" type="binary">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attestation_format" type="varchar(50)"/>
+            <column name="attestation_statement" type="binary"/>
+            <column name="client_extensions" type="text"/>
+            <column name="authenticator_extensions" type="text"/>
+            <column name="authenticator_transports" type="text"/>
+            <column name="created_date" type="timestamptz" defaultValueComputed="now()"/>
+            <column name="last_access" type="timestamptz" defaultValueComputed="now()"/>
+            <column name="counter" type="bigint" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="tbl_authenticator_user_id_fkey"
+                             references="tbl_user(id)" deleteCascade="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="createTable-tbl_package" author="system">
+        <createTable tableName="tbl_package">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="type" type="varchar(50)"/>
+            <column name="amount" type="bigint"/>
+            <column name="created_date" type="timestamptz" defaultValueComputed="now()"/>
+            <column name="activated_date" type="timestamptz"/>
+            <column name="description" type="varchar(1000)"/>
+            <column name="relying_party_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="tbl_package_relying_party_id_fkey"
+                             references="tbl_relying_party(id)" deleteCascade="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="createTable-tbl_event" author="system">
+        <createTable tableName="tbl_event">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="timestamp" type="timestamptz" defaultValueDate="now()"/>
+            <column name="event_name" type="varchar(200)"/>
+            <column name="event_type" type="varchar(50)"/>
+            <column name="event_status" type="varchar(50)"/>
+            <column name="event_detail" type="varchar(2000)"/>
+            <column name="event_object" type="text"/>
+            <column name="authenticator_id" type="uuid">
+                <constraints foreignKeyName="tbl_event_authenticator_id_fkey"
+                             references="tbl_authenticator(id)" deleteCascade="true"/>
+            </column>
+            <column name="user_id" type="uuid">
+                <constraints foreignKeyName="tbl_event_user_id_fkey"
+                             references="tbl_user(id)" deleteCascade="true"/>
+            </column>
+            <column name="relying_party_id" type="uuid">
+                <constraints foreignKeyName="tbl_event_relying_party_id_fkey"
+                             references="tbl_relying_party(id)" deleteCascade="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

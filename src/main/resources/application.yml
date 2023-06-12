@@ -1,0 +1,62 @@
+server:
+  port: 10010
+  forward-headers-strategy: FRAMEWORK
+  error:
+    include-message: ALWAYS
+    include-stacktrace: ON_PARAM
+    include-binding-errors: ON_PARAM
+    whitelabel:
+      enabled: false
+
+spring:
+  application:
+    name: ${app.name}
+  config:
+    import:
+      - config-swagger.yml
+  jpa:
+    open-in-view: false
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  liquibase:
+    change-log: classpath:/changelog/db.changelog-master.xml
+  security:
+    user:
+      name: system
+      password: system@ncpt
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - logfile
+          - metrics
+
+logging:
+  file:
+    path: ./logs
+  level:
+    root: info
+    web: info
+    sql: info
+    com.stid.project.fido2server.app.web.controller.WebAuthnController: debug
+
+app:
+  name: @project.name@
+  version: @build-version@
+  jwt-token:
+    secret-key: Y29tLnN0aWQucHJvamVjdC5maWRvMnNlcnZlcg== #com.stid.project.fido2server
+    token-validity: 1h
+    token-validity-remember: 1d
+
+  metadata:
+    mds3-endpoints:
+      # https://api.localhost.ssl:10011/webauthn
+      - https://mds3.fido.tools/execute/22f80bc9198dcb014463e386bc720293c6ec7b40158d1f835c131cee54607096
+      - https://mds3.fido.tools/execute/565c0175b71e18cbeb3b97885ab2f0bd48008e75feb008c27e0f58fc24745aeb
+      - https://mds3.fido.tools/execute/a33e73edef628df9d885e0df29f418ead195af22979ffae18fe4e5a6a512c0cd
+      - https://mds3.fido.tools/execute/c6b48384afb124e8089c67d184380b67f492421506f83a891bec83a9da5ba454
+      - https://mds3.fido.tools/execute/b8b5a4127ad31b18f32a373913ee3f7b5dcd59252be5022a60ba7a5c1339c45c
