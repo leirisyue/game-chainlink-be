@@ -42,6 +42,12 @@ public class RelyingParty {
     @Column(name = "origin", nullable = false, length = 256)
     private Origin origin;
 
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "phone")
+    private Number phone;
+
     @Convert(converter = SetSubdomainConverter.class)
     @Column(name = "subdomains")
     private Set<Subdomain> subdomains = new HashSet<>();

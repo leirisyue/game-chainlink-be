@@ -15,5 +15,9 @@ public class RelyingPartyCreateForm {
     @NotNull
     private Origin origin;
 
+    private String email;
+
+    private Number phone;
+
     private String description;
 }
