@@ -5,7 +5,6 @@ import com.stid.project.fido2server.app.domain.entity.Authenticator;
 import com.stid.project.fido2server.app.domain.entity.Package;
 import com.stid.project.fido2server.app.domain.entity.RelyingParty;
 import com.stid.project.fido2server.app.domain.entity.UserAccount;
-import com.stid.project.fido2server.app.exception.BadRequestException;
 import com.stid.project.fido2server.app.repository.AuthenticatorRepository;
 import com.stid.project.fido2server.app.repository.RelyingPartyRepository;
 import com.stid.project.fido2server.app.repository.UserAccountRepository;
@@ -15,14 +14,17 @@ import com.stid.project.fido2server.app.web.form.PackageCreateForm;
 import com.stid.project.fido2server.app.web.form.RelyingPartyCreateForm;
 import com.stid.project.fido2server.fido2.service.Fido2ServerChallengeManager;
 import com.stid.project.fido2server.fido2.util.ServletUtil;
+import com.webauthn4j.data.client.Origin;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 
 @Tag(name = "DEV")
@@ -68,16 +70,13 @@ public class DevController extends AbstractUnsecuredController {
         form.setOrigin(ServletUtil.getOrigin(request));
         form.setDescription("Local RP Test Description");
 
-        if (relyingPartyRepository.existsByNameAndOrigin(form.getName(), form.getOrigin()))
-            throw new BadRequestException("RP 'Local RP Test' was already created");
-
         RelyingParty relyingParty = systemService.createRelyingParty(form);
 
-        PackageCreateForm packageDurationForm = new PackageCreateForm();
-        packageDurationForm.setRelyingPartyId(relyingParty.getId());
-        packageDurationForm.setType(PackageType.TIME);
-        packageDurationForm.setAmount(Duration.ofDays(30).toMillis());
-        Package packageDuration = packageService.createPackage(packageDurationForm);
+        PackageCreateForm packageTimeForm = new PackageCreateForm();
+        packageTimeForm.setRelyingPartyId(relyingParty.getId());
+        packageTimeForm.setType(PackageType.TIME);
+        packageTimeForm.setAmount(Duration.ofDays(30).toMillis());
+        Package packageTime = packageService.createPackage(packageTimeForm);
 
         PackageCreateForm packageUserForm = new PackageCreateForm();
         packageUserForm.setRelyingPartyId(relyingParty.getId());
@@ -85,8 +84,22 @@ public class DevController extends AbstractUnsecuredController {
         packageUserForm.setAmount(1000);
         Package packageUser = packageService.createPackage(packageUserForm);
 
+        PackageCreateForm packageSubdomainForm = new PackageCreateForm();
+        packageSubdomainForm.setRelyingPartyId(relyingParty.getId());
+        packageSubdomainForm.setType(PackageType.SUBDOMAIN);
+        packageSubdomainForm.setAmount(10);
+        Package packageSubdomain = packageService.createPackage(packageSubdomainForm);
+
+        PackageCreateForm packagePortForm = new PackageCreateForm();
+        packagePortForm.setRelyingPartyId(relyingParty.getId());
+        packagePortForm.setType(PackageType.PORT);
+        packagePortForm.setAmount(10);
+        Package packagePort = packageService.createPackage(packagePortForm);
+
+        packageService.activatePackage(packageTime.getId());
         packageService.activatePackage(packageUser.getId());
-        packageService.activatePackage(packageDuration.getId());
+        packageService.activatePackage(packageSubdomain.getId());
+        packageService.activatePackage(packagePort.getId());
 
         return ResponseEntity.ok(relyingParty);
     }
@@ -95,4 +108,16 @@ public class DevController extends AbstractUnsecuredController {
     public ResponseEntity<Long> getChallengeCacheServiceCounter() {
         return ResponseEntity.ok(challengeManager.getChallengeCacheService().getCacheCounter());
     }
+
+    @GetMapping("/checkOrigin")
+    public ResponseEntity<HashMap<String, Object>> checkOrigin(@RequestParam String url) {
+        Origin origin = new Origin(url);
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("Scheme", origin.getScheme());
+        hashMap.put("Host", origin.getHost());
+        hashMap.put("Port", origin.getPort());
+        hashMap.put("URL", origin.toString());
+        return ResponseEntity.ok(hashMap);
+    }
+
 }

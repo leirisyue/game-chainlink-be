@@ -5,6 +5,7 @@ import com.stid.project.fido2server.app.domain.constant.EventType;
 import com.stid.project.fido2server.app.security.AccessToken;
 import com.stid.project.fido2server.app.service.AuthService;
 import com.stid.project.fido2server.app.service.EventService;
+import com.stid.project.fido2server.app.web.form.CustomLoginForm;
 import com.stid.project.fido2server.app.web.form.EndpointLoginForm;
 import com.stid.project.fido2server.app.web.form.SystemLoginForm;
 import com.webauthn4j.converter.util.JsonConverter;
@@ -56,6 +57,19 @@ public class AuthController extends AbstractUnsecuredController {
             return ResponseEntity.ok(accessToken);
         } finally {
             eventService.saveEvent();
+        }
+    }
+
+
+    @Operation(tags = "CUSTOMER", summary = "Login user")
+    @PostMapping("/customer/access-token")
+    public ResponseEntity<AccessToken> generateCustomerAccessToken(
+            @RequestBody @Valid CustomLoginForm form) {
+        LOGGER.debug("generateCustomerAccessToken...");
+        try {
+            AccessToken accessToken = authService.generateCustomerAccessToken(form);
+            return ResponseEntity.ok(accessToken);
+        } finally {
         }
     }
 

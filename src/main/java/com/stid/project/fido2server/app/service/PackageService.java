@@ -5,7 +5,6 @@ import com.stid.project.fido2server.app.domain.entity.Package;
 import com.stid.project.fido2server.app.domain.entity.RelyingParty;
 import com.stid.project.fido2server.app.domain.model.ServiceLicenseDto;
 import com.stid.project.fido2server.app.exception.AbstractExceptionHandler;
-import com.stid.project.fido2server.app.exception.ForbiddenException;
 import com.stid.project.fido2server.app.repository.PackageRepository;
 import com.stid.project.fido2server.app.repository.RelyingPartyRepository;
 import com.stid.project.fido2server.app.repository.UserAccountRepository;
@@ -162,7 +161,7 @@ public class PackageService extends AbstractExceptionHandler {
             List<Package> activatedPackages = findAllActivatedByRelyingPartyId(relyingPartyId);
             ServiceLicenseDto.DurationDto licenseTime = calculateLicenseTime(activatedPackages, Instant.now());
             if (licenseTime.getRemainingSeconds() <= 0)
-                throw new ForbiddenException("Exception.LicenseExpired");
+                throw forbidden("Exception.LicenseExpired");
         }
     }
 
@@ -172,7 +171,7 @@ public class PackageService extends AbstractExceptionHandler {
             List<Package> activatedPackages = findAllActivatedByRelyingPartyId(relyingPartyId);
             ServiceLicenseDto.QuantityDto licenseUser = calculateLicenseUser(relyingParty, activatedPackages);
             if (licenseUser.getFreeQuantity() <= 0)
-                throw new ForbiddenException("Exception.UserQuantityReachedLimit");
+                throw forbidden("Exception.UserQuantityReachedLimit");
         }
     }
 }

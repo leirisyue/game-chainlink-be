@@ -1,19 +1,26 @@
 package com.stid.project.fido2server.app.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.stid.project.fido2server.app.domain.constant.Status;
 import com.stid.project.fido2server.app.util.OriginConverter;
 import com.stid.project.fido2server.app.util.SetIntegerConverter;
-import com.stid.project.fido2server.app.util.SetStringConverter;
+import com.stid.project.fido2server.app.util.SetSubdomainConverter;
 import com.webauthn4j.data.PublicKeyCredentialRpEntity;
 import com.webauthn4j.data.client.Origin;
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.util.StringUtils;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -35,9 +42,9 @@ public class RelyingParty {
     @Column(name = "origin", nullable = false, length = 256)
     private Origin origin;
 
-    @Convert(converter = SetStringConverter.class)
+    @Convert(converter = SetSubdomainConverter.class)
     @Column(name = "subdomains")
-    private Set<String> subdomains = new HashSet<>();
+    private Set<Subdomain> subdomains = new HashSet<>();
 
     @Convert(converter = SetIntegerConverter.class)
     @Column(name = "ports")
@@ -60,30 +67,60 @@ public class RelyingParty {
     public Set<Origin> getOrigins() {
         Set<Origin> origins = new HashSet<>();
         origins.add(origin);
-        if (subdomains != null) {
-            subdomains.forEach(subdomain -> {
-                origins.add(Origin.create(origin.getScheme() + "://" + subdomain + "." + origin.getHost() + ":" + origin.getPort()));
-                if (ports != null) {
-                    ports.forEach(port -> {
-                        origins.add(Origin.create(origin.getScheme() + "://" + subdomain + "." + origin.getHost() + ":" + port));
-                    });
-                }
-            });
-        }
         if (ports != null) {
-            ports.forEach(port -> {
-                origins.add(Origin.create(origin.getScheme() + "://" + origin.getHost() + ":" + port));
-                if (subdomains != null) {
-                    subdomains.forEach(subdomain -> {
-                        origins.add(Origin.create(origin.getScheme() + "://" + subdomain + "." + origin.getHost() + ":" + port));
-                    });
-                }
-            });
+            ports.stream().map(port -> Origin.create(origin.getScheme() + "://" + origin.getHost() + ":" + port)).forEach(origins::add);
+        }
+        if (subdomains != null) {
+            final Set<Origin> subOrigins = subdomains.stream()
+                    .map(subdomain -> subdomain.toOrigin(origin))
+                    .collect(Collectors.toSet());
+            origins.addAll(subOrigins);
         }
         return origins;
     }
 
     public PublicKeyCredentialRpEntity toRpEntity() {
         return new PublicKeyCredentialRpEntity(getRpId(), name);
+    }
+
+    @Data
+    @EqualsAndHashCode
+    public static class Subdomain implements Serializable {
+        private String subdomain;
+        private int port = -1;
+
+        @JsonCreator
+        public static Subdomain fromString(String value) {
+            Subdomain subdomain = new Subdomain();
+            if (StringUtils.hasText(value)) {
+                final String[] split = value.split(":", 2);
+                subdomain.setSubdomain(split[0]);
+                subdomain.setPort(-1);
+                if (split.length == 2) {
+                    try {
+                        int port = Integer.parseInt(split[1]);
+                        if (port > -1) {
+                            subdomain.setPort(port);
+                        }
+                    } catch (Exception ignored) {
+                    }
+                }
+                return subdomain;
+            }
+            return null;
+        }
+
+        public Origin toOrigin(Origin origin) {
+            String subOrigin = origin.getScheme() + "://" + subdomain + "." + origin.getHost();
+            if (port > -1)
+                subOrigin += ":" + port;
+            return Origin.create(subOrigin);
+        }
+
+        @JsonValue
+        public String toString() {
+            //return port != null && port > 0 ? subdomain + ":" + port : subdomain;
+            return port != -1 ? subdomain + ":" + port : subdomain;
+        }
     }
 }

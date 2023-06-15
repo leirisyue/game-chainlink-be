@@ -109,7 +109,7 @@ public class WebSecurityConfiguration {
                 .accessDeniedHandler(accessDeniedHandler)
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/auth/**", "/api/public/**", "/actuator/health").permitAll()
+                .requestMatchers("/api/auth/**", "/api/public/**", "/actuator/health","/api/customer/**").permitAll()
                 .requestMatchers("/api/system/**").hasAuthority("ROLE_SYSTEM")
                 .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
                 .requestMatchers("/api/user/**").hasAuthority("ROLE_USER")

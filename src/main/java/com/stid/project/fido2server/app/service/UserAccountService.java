@@ -6,6 +6,7 @@ import com.stid.project.fido2server.app.exception.AbstractExceptionHandler;
 import com.stid.project.fido2server.app.repository.AuthenticatorRepository;
 import com.stid.project.fido2server.app.repository.UserAccountRepository;
 import com.stid.project.fido2server.app.util.HelperUtil;
+import com.stid.project.fido2server.app.web.form.CustomCreateForm;
 import com.stid.project.fido2server.app.web.form.UserAccountCreateForm;
 import com.stid.project.fido2server.app.web.form.UserAuthenticatorUpdateForm;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,7 +37,21 @@ public class UserAccountService extends AbstractExceptionHandler {
         userAccount.setUserHandle(HelperUtil.randomUserHandle());
         userAccount.setUserLogin(form.getUsername());
         userAccount.setDisplayName(form.getDisplayName());
-        userAccount.setPasswordHash(passwordEncoder.encode(form.getPassword()));
+        userAccount.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
+        userAccount.setRelyingPartyId(relyingPartyId);
+        userAccount = userAccountRepository.save(userAccount);
+        return userAccount;
+    }
+
+    @Transactional
+    public UserAccount createCustomerAccount(CustomCreateForm form, UUID relyingPartyId) {
+        if (userAccountRepository.existsByUserLoginAndRelyingPartyId(form.getUsername(), relyingPartyId))
+            throw badRequest("Exception.UserAccountExists");
+        UserAccount userAccount = new UserAccount();
+        userAccount.setUserHandle(HelperUtil.randomUserHandle());
+        userAccount.setUserLogin(form.getUsername());
+        userAccount.setDisplayName(form.getDisplayName());
+        userAccount.setPasswordHash(form.getPassword());
         userAccount.setRelyingPartyId(relyingPartyId);
         userAccount = userAccountRepository.save(userAccount);
         return userAccount;

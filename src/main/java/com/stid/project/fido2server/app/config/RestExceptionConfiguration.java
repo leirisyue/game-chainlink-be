@@ -55,7 +55,7 @@ public class RestExceptionConfiguration extends ResponseEntityExceptionHandler i
 
     @ExceptionHandler(RestException.class)
     public ResponseEntity<Object> handleRestException(RestException ex, Locale locale) {
-        String errorMessage = messageSource.getMessage(ex.getMessage(), null, locale);
+        String errorMessage = messageSource.getMessage(ex.getMessage(), ex.getParams(), locale);
         eventService.saveEvent(EventStatus.FAILURE, errorMessage);
         return ResponseEntity.status(ex.getHttpStatus()).body(new ErrorResponse(errorMessage));
     }

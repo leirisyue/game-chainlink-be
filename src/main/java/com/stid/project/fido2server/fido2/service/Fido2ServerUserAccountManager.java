@@ -34,7 +34,6 @@ public class Fido2ServerUserAccountManager {
         return userAccountService.createUserAccount(UserAccountCreateForm.builder()
                 .username(username)
                 .displayName(displayName)
-                .password(UUID.randomUUID().toString())
                 .build(), relyingPartyId);
     }
 

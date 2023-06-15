@@ -65,9 +65,14 @@ public class Fido2ServerApplication {
         );
     }
 
-    @RequestMapping({"/login", "/register", "/dashboard"})
-    public String redirect() {
-        return "forward:/";
+    @RequestMapping({"/auth/**", "/pages/**"})
+    public String forwardApp() {
+        return "forward:/app.html";
+    }
+
+    @RequestMapping("/app")
+    public String redirectApp() {
+        return "redirect:/app.html";
     }
 
 }

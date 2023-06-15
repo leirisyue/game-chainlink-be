@@ -8,19 +8,22 @@ import com.stid.project.fido2server.app.domain.entity.RelyingParty;
 import com.stid.project.fido2server.app.domain.entity.UserAccount;
 import com.stid.project.fido2server.app.domain.model.ServiceLicenseDto;
 import com.stid.project.fido2server.app.exception.AbstractExceptionHandler;
-import com.stid.project.fido2server.app.exception.ForbiddenException;
 import com.stid.project.fido2server.app.repository.RelyingPartyRepository;
-import com.stid.project.fido2server.app.web.form.RelyingPartyUpdateForm;
+import com.stid.project.fido2server.app.web.form.EndpointInfoUpdateForm;
 import com.stid.project.fido2server.app.web.form.UserAccountCreateForm;
 import com.stid.project.fido2server.app.web.form.UserAuthenticatorUpdateForm;
 import com.webauthn4j.converter.util.JsonConverter;
 import com.webauthn4j.converter.util.ObjectConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class EndpointService extends AbstractExceptionHandler {
@@ -39,22 +42,40 @@ public class EndpointService extends AbstractExceptionHandler {
     }
 
     @Transactional
-    public void updateInfo(RelyingPartyUpdateForm form, RelyingParty relyingParty) {
+    public void updateInfo(EndpointInfoUpdateForm form, RelyingParty relyingParty) {
+        //NOTE: check subdomain
+        Set<RelyingParty.Subdomain> subdomains = form.getSubdomains().stream()
+                .filter(p -> p != null && StringUtils.hasText(p.getSubdomain()))
+                .collect(Collectors.toSet());
+
+        Set<Integer> ports = form.getPorts().stream()
+                .filter(p -> p != null && p > -1)
+                .collect(Collectors.toSet());
+
+        subdomains.forEach(p -> {
+            if (!Pattern.matches("^[a-zA-Z0-9][a-zA-Z0-9\\-\\.]*[a-zA-Z0-9]$", p.getSubdomain()))
+                throw badRequest("Exception.InvalidSubdomainPattern", p.getSubdomain());
+
+            if (p.toOrigin(relyingParty.getOrigin()).getHost() == null)
+                throw badRequest("Exception.InvalidSubdomainForOrigin", relyingParty.getRpId());
+        });
+
         //NOTE: check package
         ServiceLicenseDto serviceLicense = packageService.calculateServiceLicense(relyingParty.getId());
-        long updateSubdomains = form.getSubdomains().size();
+        long updateSubdomains = subdomains.size();
         long availableSubdomains = serviceLicense.getSubdomain().getFreeQuantity() + relyingParty.getSubdomains().size();
         if (updateSubdomains > availableSubdomains)
-            throw new ForbiddenException("Exception.SubdomainQuantityReachedLimit");
+            throw forbidden("Exception.SubdomainQuantityReachedLimit");
 
-        long updatePorts = form.getPorts().size();
+
+        long updatePorts = ports.size();
         long availablePorts = serviceLicense.getPort().getFreeQuantity() + relyingParty.getPorts().size();
         if (updatePorts > availablePorts)
-            throw new ForbiddenException("Exception.PortQuantityReachedLimit");
+            throw forbidden("Exception.PortQuantityReachedLimit");
 
         eventService.logEvent(relyingParty.getId(), EventName.RELYING_PARTY_UPDATE_INFO, EventType.UPDATE, jsonConverter.writeValueAsString(form));
-        relyingParty.setSubdomains(form.getSubdomains());
-        relyingParty.setPorts(form.getPorts());
+        relyingParty.setSubdomains(subdomains);
+        relyingParty.setPorts(ports);
         relyingPartyRepository.save(relyingParty);
         eventService.saveEvent();
     }

@@ -60,3 +60,8 @@ app:
       - https://mds3.fido.tools/execute/a33e73edef628df9d885e0df29f418ead195af22979ffae18fe4e5a6a512c0cd
       - https://mds3.fido.tools/execute/c6b48384afb124e8089c67d184380b67f492421506f83a891bec83a9da5ba454
       - https://mds3.fido.tools/execute/b8b5a4127ad31b18f32a373913ee3f7b5dcd59252be5022a60ba7a5c1339c45c
+
+  chainlink:
+    vrf:
+      contractAddress: "<ORACLE_CONTRACT_ADDRESS>"
+      jobId: "<JOB_ID>"

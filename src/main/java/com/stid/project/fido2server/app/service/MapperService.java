@@ -3,10 +3,14 @@ package com.stid.project.fido2server.app.service;
 import com.stid.project.fido2server.app.domain.entity.Package;
 import com.stid.project.fido2server.app.domain.entity.*;
 import com.stid.project.fido2server.app.domain.model.*;
+import com.stid.project.fido2server.app.util.OriginComparator;
 import com.webauthn4j.converter.util.CborConverter;
 import com.webauthn4j.converter.util.ObjectConverter;
+import com.webauthn4j.data.client.Origin;
 import com.webauthn4j.util.Base64UrlUtil;
 import org.springframework.stereotype.Service;
+
+import java.util.Comparator;
 
 @Service
 public class MapperService {
@@ -32,8 +36,14 @@ public class MapperService {
                 relyingParty.getSecret(),
                 relyingParty.getName(),
                 relyingParty.getOrigin(),
-                relyingParty.getSubdomains(),
-                relyingParty.getPorts(),
+                relyingParty.getSubdomains().stream()
+                        .sorted(Comparator.comparing(RelyingParty.Subdomain::toString))
+                        .toList(),
+                relyingParty.getPorts().stream().sorted().toList(),
+                relyingParty.getOrigins().stream()
+                        .sorted(OriginComparator.getComparator())
+                        .map(Origin::toString)
+                        .toList(),
                 relyingParty.getDescription(),
                 relyingParty.getCreatedDate(),
                 relyingParty.getStatus());
