@@ -112,41 +112,41 @@ public class EndpointController extends AbstractSecuredController {
         return ResponseEntity.ok(mapperService.mapping(userAccount));
     }
 
-    @Operation(summary = "Get all user's authenticators")
-    @GetMapping("/users/{id}/authenticators")
-    public ResponseEntity<List<AuthenticatorDto>> getAllUserAuthenticator(
-            @PathVariable UUID id,
-            @CurrentSpringUser SpringUser springUser) {
-        List<Authenticator> userAuthenticators = endpointService
-                .findAllUserAuthenticator(id, springUser.getRelyingParty().getId());
-        return ResponseEntity.ok(userAuthenticators.stream()
-                .map(mapperService::mapping)
-                .collect(Collectors.toList()));
-    }
+//    @Operation(summary = "Get all user's authenticators")
+//    @GetMapping("/users/{id}/authenticators")
+//    public ResponseEntity<List<AuthenticatorDto>> getAllUserAuthenticator(
+//            @PathVariable UUID id,
+//            @CurrentSpringUser SpringUser springUser) {
+//        List<Authenticator> userAuthenticators = endpointService
+//                .findAllUserAuthenticator(id, springUser.getRelyingParty().getId());
+//        return ResponseEntity.ok(userAuthenticators.stream()
+//                .map(mapperService::mapping)
+//                .collect(Collectors.toList()));
+//    }
 
-    @Operation(summary = "Update user's authenticator by user id and authenticator id")
-    @PutMapping("/users/{id}/authenticators/{authenticatorId}")
-    public ResponseEntity<AuthenticatorDto> updateUserAuthenticator(
-            @PathVariable UUID id, @PathVariable UUID authenticatorId,
-            @RequestBody @Valid UserAuthenticatorUpdateForm form,
-            @CurrentSpringUser SpringUser springUser) {
-        Authenticator userAuthenticator = endpointService
-                .updateUserAuthenticator(authenticatorId, id, form, springUser.getRelyingParty().getId());
-        return ResponseEntity.ok(mapperService.mapping(userAuthenticator));
-    }
+//    @Operation(summary = "Update user's authenticator by user id and authenticator id")
+//    @PutMapping("/users/{id}/authenticators/{authenticatorId}")
+//    public ResponseEntity<AuthenticatorDto> updateUserAuthenticator(
+//            @PathVariable UUID id, @PathVariable UUID authenticatorId,
+//            @RequestBody @Valid UserAuthenticatorUpdateForm form,
+//            @CurrentSpringUser SpringUser springUser) {
+//        Authenticator userAuthenticator = endpointService
+//                .updateUserAuthenticator(authenticatorId, id, form, springUser.getRelyingParty().getId());
+//        return ResponseEntity.ok(mapperService.mapping(userAuthenticator));
+//    }
 
-    @Operation(summary = "Delete user's authenticator by user id and authenticator id")
-    @DeleteMapping("/users/{id}/authenticators/{authenticatorId}")
-    public ResponseEntity<AuthenticatorDto> deleteUserAuthenticator(
-            @PathVariable UUID id, @PathVariable UUID authenticatorId,
-            @CurrentSpringUser SpringUser springUser) {
-        eventService.logEvent(springUser.getRelyingParty().getId(), id,
-                EventName.RELYING_PARTY_DELETE_AUTHENTICATOR, EventType.DELETE, authenticatorId.toString());
-        Authenticator userAuthenticator = endpointService
-                .deleteUserAuthenticator(authenticatorId, id, springUser.getRelyingParty().getId());
-        eventService.saveEvent();
-        return ResponseEntity.ok(mapperService.mapping(userAuthenticator));
-    }
+//    @Operation(summary = "Delete user's authenticator by user id and authenticator id")
+//    @DeleteMapping("/users/{id}/authenticators/{authenticatorId}")
+//    public ResponseEntity<AuthenticatorDto> deleteUserAuthenticator(
+//            @PathVariable UUID id, @PathVariable UUID authenticatorId,
+//            @CurrentSpringUser SpringUser springUser) {
+//        eventService.logEvent(springUser.getRelyingParty().getId(), id,
+//                EventName.RELYING_PARTY_DELETE_AUTHENTICATOR, EventType.DELETE, authenticatorId.toString());
+//        Authenticator userAuthenticator = endpointService
+//                .deleteUserAuthenticator(authenticatorId, id, springUser.getRelyingParty().getId());
+//        eventService.saveEvent();
+//        return ResponseEntity.ok(mapperService.mapping(userAuthenticator));
+//    }
 
     //TODO: FIDO2
     @Operation(summary = "FIDO Attestation: Start register authenticator by username")

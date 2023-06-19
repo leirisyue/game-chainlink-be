@@ -35,49 +35,49 @@ public class WebAuthnController extends AbstractUnsecuredController {
         this.eventService = eventService;
     }
 
-    @PostMapping("/attestation/options")
-    public ResponseEntity<AttestationOptionsResponse> webAuthnAttestationOptions(
-            HttpServletRequest httpServletRequest,
-            @RequestBody @Valid AttestationOptionsRequest request) {
-        LOGGER.debug(">>> AttestationOptionsRequest: {}", objectConverter.getJsonConverter().writeValueAsString(request));
-        AttestationOptionsResponse attestationOptions = fido2Service
-                .attestationOptions(request, getMds3TestRelyingParty(httpServletRequest));
-        LOGGER.debug("<<< AttestationOptionsResponse: {}", objectConverter.getJsonConverter().writeValueAsString(attestationOptions));
-        return ResponseEntity.ok(attestationOptions);
-    }
+//    @PostMapping("/attestation/options")
+//    public ResponseEntity<AttestationOptionsResponse> webAuthnAttestationOptions(
+//            HttpServletRequest httpServletRequest,
+//            @RequestBody @Valid AttestationOptionsRequest request) {
+//        LOGGER.debug(">>> AttestationOptionsRequest: {}", objectConverter.getJsonConverter().writeValueAsString(request));
+//        AttestationOptionsResponse attestationOptions = fido2Service
+//                .attestationOptions(request, getMds3TestRelyingParty(httpServletRequest));
+//        LOGGER.debug("<<< AttestationOptionsResponse: {}", objectConverter.getJsonConverter().writeValueAsString(attestationOptions));
+//        return ResponseEntity.ok(attestationOptions);
+//    }
 
-    @PostMapping("/attestation/result")
-    public ResponseEntity<AttestationResultResponse> webAuthnAttestationResult(
-            HttpServletRequest httpServletRequest,
-            @RequestBody @Valid AttestationResultRequest request) {
-        LOGGER.debug(">>> AttestationResultRequest: {}", objectConverter.getJsonConverter().writeValueAsString(request));
-        AttestationResultResponse attestationResult = fido2Service
-                .attestationResult(request.toCredential(), getMds3TestRelyingParty(httpServletRequest));
-        LOGGER.debug("<<< AttestationResultResponse: {}", objectConverter.getJsonConverter().writeValueAsString(attestationResult));
-        return ResponseEntity.ok(attestationResult);
-    }
+//    @PostMapping("/attestation/result")
+//    public ResponseEntity<AttestationResultResponse> webAuthnAttestationResult(
+//            HttpServletRequest httpServletRequest,
+//            @RequestBody @Valid AttestationResultRequest request) {
+//        LOGGER.debug(">>> AttestationResultRequest: {}", objectConverter.getJsonConverter().writeValueAsString(request));
+//        AttestationResultResponse attestationResult = fido2Service
+//                .attestationResult(request.toCredential(), getMds3TestRelyingParty(httpServletRequest));
+//        LOGGER.debug("<<< AttestationResultResponse: {}", objectConverter.getJsonConverter().writeValueAsString(attestationResult));
+//        return ResponseEntity.ok(attestationResult);
+//    }
 
-    @PostMapping("/assertion/options")
-    public ResponseEntity<AssertionOptionsResponse> webAuthnAssertionOptions(
-            HttpServletRequest httpServletRequest,
-            @RequestBody @Valid AssertionOptionsRequest request) {
-        LOGGER.debug(">>> AssertionOptionsRequest: {}", objectConverter.getJsonConverter().writeValueAsString(request));
-        AssertionOptionsResponse assertionOptions = fido2Service
-                .assertionOptions(request, getMds3TestRelyingParty(httpServletRequest));
-        LOGGER.debug("<<< AssertionOptionsResponse: {}", objectConverter.getJsonConverter().writeValueAsString(assertionOptions));
-        return ResponseEntity.ok(assertionOptions);
-    }
+//    @PostMapping("/assertion/options")
+//    public ResponseEntity<AssertionOptionsResponse> webAuthnAssertionOptions(
+//            HttpServletRequest httpServletRequest,
+//            @RequestBody @Valid AssertionOptionsRequest request) {
+//        LOGGER.debug(">>> AssertionOptionsRequest: {}", objectConverter.getJsonConverter().writeValueAsString(request));
+//        AssertionOptionsResponse assertionOptions = fido2Service
+//                .assertionOptions(request, getMds3TestRelyingParty(httpServletRequest));
+//        LOGGER.debug("<<< AssertionOptionsResponse: {}", objectConverter.getJsonConverter().writeValueAsString(assertionOptions));
+//        return ResponseEntity.ok(assertionOptions);
+//    }
 
-    @PostMapping("/assertion/result")
-    public ResponseEntity<AssertionResultResponse> webAuthnAssertionResult(
-            HttpServletRequest httpServletRequest,
-            @RequestBody @Valid AssertionResultRequest request) {
-        LOGGER.debug(">>> AssertionResultRequest: {}", objectConverter.getJsonConverter().writeValueAsString(request));
-        AssertionResultResponse assertionResult = fido2Service
-                .assertionResult(request.toCredential(), getMds3TestRelyingParty(httpServletRequest));
-        LOGGER.debug("<<< AssertionResultResponse: {}", objectConverter.getJsonConverter().writeValueAsString(assertionResult));
-        return ResponseEntity.ok(assertionResult);
-    }
+//    @PostMapping("/assertion/result")
+//    public ResponseEntity<AssertionResultResponse> webAuthnAssertionResult(
+//            HttpServletRequest httpServletRequest,
+//            @RequestBody @Valid AssertionResultRequest request) {
+//        LOGGER.debug(">>> AssertionResultRequest: {}", objectConverter.getJsonConverter().writeValueAsString(request));
+//        AssertionResultResponse assertionResult = fido2Service
+//                .assertionResult(request.toCredential(), getMds3TestRelyingParty(httpServletRequest));
+//        LOGGER.debug("<<< AssertionResultResponse: {}", objectConverter.getJsonConverter().writeValueAsString(assertionResult));
+//        return ResponseEntity.ok(assertionResult);
+//    }
 
     @ExceptionHandler(WebAuthnException.class)
     public ResponseEntity<Object> handleWebAuthnException(WebAuthnException ex, Locale locale) {
