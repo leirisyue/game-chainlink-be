@@ -14,5 +14,5 @@ import java.util.UUID;
  */
 public record RelyingPartyDto(UUID id, String secret, String name, Origin origin,
                               List<RelyingParty.Subdomain> subdomains, List<Integer> ports, List<String> origins,
-                              String description, Instant createdDate, Status status) implements Serializable {
+                              String description, Instant createdDate, Status status, String email, Number phone) implements Serializable {
 }

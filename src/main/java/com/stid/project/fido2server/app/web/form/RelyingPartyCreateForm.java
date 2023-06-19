@@ -17,7 +17,7 @@ public class RelyingPartyCreateForm {
 
     private String email;
 
-    private Number phone;
+    private Integer phone;
 
     private String description;
 }

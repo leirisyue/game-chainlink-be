@@ -46,7 +46,9 @@ public class MapperService {
                         .toList(),
                 relyingParty.getDescription(),
                 relyingParty.getCreatedDate(),
-                relyingParty.getStatus());
+                relyingParty.getStatus(),
+                relyingParty.getEmail(),
+                relyingParty.getPhone());
     }
 
     public UserAccountDto mapping(UserAccount userAccount) {

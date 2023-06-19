@@ -42,12 +42,6 @@ public class RelyingParty {
     @Column(name = "origin", nullable = false, length = 256)
     private Origin origin;
 
-    @Column(name = "email")
-    private String email;
-
-    @Column(name = "phone")
-    private Number phone;
-
     @Convert(converter = SetSubdomainConverter.class)
     @Column(name = "subdomains")
     private Set<Subdomain> subdomains = new HashSet<>();
@@ -65,6 +59,13 @@ public class RelyingParty {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private Status status = Status.ACTIVE;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "phone")
+    private Integer phone;
+
 
     public String getRpId() {
         return origin.getHost();

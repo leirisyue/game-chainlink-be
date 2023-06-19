@@ -56,7 +56,7 @@ public class SystemService extends AbstractExceptionHandler {
         String name = form.getName();
         Origin origin = form.getOrigin();
         String email = form.getEmail();
-        Number phone = form.getPhone();
+        Integer phone = form.getPhone();
         String originPattern = "^https://([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9-]+\\.[a-zA-Z]{2,6}(:[0-9]+)?/?";
         if (origin.getHost() == null || !Pattern.matches(originPattern, origin.toString()))
             throw badRequest("Exception.InvalidOrigin");
@@ -85,6 +85,8 @@ public class SystemService extends AbstractExceptionHandler {
 
         String name = form.getName();
         Origin origin = form.getOrigin();
+        String email = form.getEmail();
+        Integer phone = form.getPhone();
         String originPattern = "^https://([a-zA-Z0-9-]+\\.)*[a-zA-Z0-9-]+\\.[a-zA-Z]{2,6}(:[0-9]+)?/?";
         if (origin.getHost() == null || !Pattern.matches(originPattern, origin.toString()))
             throw badRequest("Exception.InvalidOrigin");
@@ -95,6 +97,8 @@ public class SystemService extends AbstractExceptionHandler {
         }
         relyingParty.setName(name);
         relyingParty.setOrigin(origin);
+        relyingParty.setEmail(email);
+        relyingParty.setPhone(phone);
         relyingParty.setDescription(form.getDescription());
         relyingPartyRepository.save(relyingParty);
         return relyingParty;

@@ -15,5 +15,9 @@ public class RelyingPartyUpdateForm {
     @NotNull
     private Origin origin;
 
+    private  String email;
+
+    private  Integer phone;
+
     private String description;
 }

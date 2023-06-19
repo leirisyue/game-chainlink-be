@@ -45,7 +45,7 @@ logging:
     com.stid.project.fido2server.app.web.controller.WebAuthnController: debug
 
 app:
-  name: @project.name@
+  name:
   version: @build-version@
   jwt-token:
     secret-key: Y29tLnN0aWQucHJvamVjdC5maWRvMnNlcnZlcg== #com.stid.project.fido2server
